@@ -1,0 +1,10 @@
+# api
+api/node_modules
+api/yarn-error.log
+api/dist
+
+# client
+client/node_modules
+client/yarn-error.log
+client/.nuxt
+client/dist

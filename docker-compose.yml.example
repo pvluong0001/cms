@@ -1,0 +1,109 @@
+version: "3.7"
+
+services:
+  api:
+    build:
+      context: ./docker/api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./api:/api
+    depends_on:
+      - mongo
+#      - redis
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      MONGO_DB_URL: "mongodb://mongo:27017"
+      REDIS_PASSWORD: 123@!23a
+    command: /bin/sh /entrypoint.sh
+    networks:
+      - project
+
+  client:
+    build:
+      context: ./docker/client
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./client:/client
+    environment:
+      NODE_ENV: dev
+    command: /bin/sh /entrypoint.sh
+    networks:
+      - project
+
+
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    restart: always
+    tty: true
+    networks:
+      - project
+    volumes:
+      - ./docker/logs/:/var/log/nginx/
+
+  varnish-client:
+    build:
+      context: docker/varnish/client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - nginx
+    networks:
+      - project
+    restart: always
+    volumes:
+      - ./docker/varnish/client/default.vcl:/etc/varnish/default.vcl
+
+  varnish-api:
+    build:
+      context: ./docker/varnish/api
+      dockerfile: Dockerfile
+    ports:
+      - "81:80"
+    depends_on:
+      - nginx
+    networks:
+      - project
+    restart: always
+    volumes:
+      - ./docker/varnish/api/default.vcl:/etc/varnish/default.vcl
+
+  mongo:
+    image: mongo
+    ports:
+      - "30001:27017"
+    networks:
+      - project
+    volumes:
+      - mongodbdata:/data/db
+
+#  redis:
+#    build:
+#      context: ./docker/redis
+#      dockerfile: Dockerfile
+#    environment:
+#      REDIS_PASSWORD: 123@!23a
+#    restart: unless-stopped
+#    volumes:
+#      - redisdata:/data
+#    ports:
+#      - "63790:6379"
+#    command: /bin/sh /entrypoint.sh
+#    networks:
+#      - project
+
+volumes:
+  mongodbdata:
+    name: "mongodbdata"
+    driver: local
+#  redisdata:
+#    name: "redisdata"
+#    driver: local
+
+networks:
+  project:
+    driver: bridge

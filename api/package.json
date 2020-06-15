@@ -1,0 +1,52 @@
+{
+  "author": "Lit",
+  "license": "ISC",
+  "scripts": {
+    "transpile": "babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log",
+    "clean": "rimraf dist",
+    "build": "npm-run-all clean transpile",
+    "server": "node ./dist",
+    "prod": "NODE_ENV=production npm-run-all build server",
+    "dev": "NODE_ENV=development npm-run-all build server",
+    "watch:dev": "nodemon",
+    "start": "yarn run prod"
+  },
+  "nodemonConfig": {
+    "exec": "yarn run dev",
+    "watch": [
+      "src/*",
+      "public/*",
+      "index.js",
+      "alias.config.js"
+    ]
+  },
+  "dependencies": {
+    "acl": "^0.4.11",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "module-alias": "^2.2.2",
+    "moment": "^2.25.1",
+    "mongoose": "^5.9.11",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "uuid": "^8.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "handlebars": "^4.7.6",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "yargs": "^15.3.1"
+  }
+}
